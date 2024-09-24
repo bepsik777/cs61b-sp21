@@ -138,9 +138,6 @@ public class Model extends Observable {
 
                 for (int nextTile = row + 1; nextTile < b.size(); nextTile += 1) {
                     if (isValidMove(t, b, nextTile, col, wasMerged)) {
-                        System.out.println("next valid move for tile " + t.value() + " on col: " + t.col() + ", row: " + t.row()
-                        + " is " + col + " " + nextTile);
-
                         nextValidMove = nextTile;
                     } else {
                         break;
