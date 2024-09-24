@@ -137,7 +137,15 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
+        int size = b.size();
+        for (int row = 0; row < size; row += 1) {
+            for (int col = 0; col < size; col += 1) {
+                Tile tile = b.tile(row, col);
+                if (tile == null) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -147,7 +155,15 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
+        int size = b.size();
+        for (int row = 0; row < size; row += 1) {
+            for (int col = 0; col < size; col += 1) {
+                Tile tile = b.tile(row, col);
+                if (tile != null && tile.value() == MAX_PIECE) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -157,8 +173,38 @@ public class Model extends Observable {
      * 1. There is at least one empty space on the board.
      * 2. There are two adjacent tiles with the same value.
      */
+    public static Tile[] getAdjacentTiles(Board b, Tile t) {
+        int row = t.row();
+        int col = t.col();
+        Tile[] adjacentTiles = new Tile[4];
+        int[][] coordinates = {{row - 1, col}, {row + 1, col}, {row, col - 1}, {row, col + 1}};
+        for (int i = 0; i < 4; i += 1) {
+            int checkedRow = coordinates[i][0];
+            int checkedCol = coordinates[i][1];
+
+            if (checkedRow >= 0 && checkedRow <= b.size() - 1 && checkedCol >= 0 && checkedCol <= b.size() - 1) {
+                adjacentTiles[i] = b.tile(checkedCol, checkedRow);
+            }
+        }
+        return adjacentTiles;
+    }
+
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        int size = b.size();
+        if (emptySpaceExists(b)) {
+            return true;
+        }
+        for (int row = 0; row < size; row += 1) {
+            for (int col = 0; col < size; col += 1) {
+                Tile tile = b.tile(row, col);
+                Tile[] adjacentTiles = getAdjacentTiles(b, tile);
+                for (Tile t: adjacentTiles) {
+                    if (t != null && t.value() == tile.value()) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
