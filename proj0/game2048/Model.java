@@ -106,13 +106,75 @@ public class Model extends Observable {
      *    value, then the leading two tiles in the direction of motion merge,
      *    and the trailing tile does not.
      * */
+    private static boolean isValidMove(Tile tile, Board b, int row, int col, boolean wasMerged) {
+        if (row < b.size()) {
+            Tile nextTile = b.tile(col, row);
+
+            if (nextTile == null) {
+                return true;
+            }
+
+            if (nextTile.value() == tile.value() && wasMerged == false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static int tiltOneColumn(Board b, int col, Side side) {
+        boolean wasMerged = false;
+        int score = 0;
+        // Iterate over tiles in a column
+
+        if (!side.equals(Side.NORTH)) {
+            b.setViewingPerspective(side);
+        }
+
+        for (int row = b.size() - 1; row >= 0; row -= 1) {
+            Tile t = b.tile(col, row);
+            int nextValidMove = row;
+            if (t != null) {
+                // Iterate over each tile above the current tile
+
+                for (int nextTile = row + 1; nextTile < b.size(); nextTile += 1) {
+                    if (isValidMove(t, b, nextTile, col, wasMerged)) {
+                        System.out.println("next valid move for tile " + t.value() + " on col: " + t.col() + ", row: " + t.row()
+                        + " is " + col + " " + nextTile);
+
+                        nextValidMove = nextTile;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (nextValidMove != row) {
+                    wasMerged = b.move(col, nextValidMove, t);
+                    if (wasMerged) {
+                        score += t.next().value();
+                    }
+                }
+            }
+        }
+        b.setViewingPerspective(Side.NORTH);
+        return score;
+    }
+
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
+        String prevState = board.toString();
+
 
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        for (int col = 0; col < board.size(); col += 1) {
+            this.score += tiltOneColumn(board, col, side);
+        }
+
+        if (!prevState.equals(board.toString())) {
+            changed = true;
+        }
 
         checkGameOver();
         if (changed) {
