@@ -22,23 +22,41 @@ public class LinkedListDeque<T> {
         size = 0;
     }
 
+    private void createFirstNode(T value) {
+        Node<T> node = new Node<>(value, (Node<T>)sentinel, (Node<T>)sentinel);
+        sentinel.prev = node;
+        sentinel.next = node;
+        size += 1;
+    }
+
     public void addFirst(T value) {
-        Node<T> newNode = new Node(value, null, null);
 
         if (size == 0) {
-            sentinel.prev = newNode;
-            newNode.next = (Node<T>) sentinel;
-            newNode.prev = (Node<T>) sentinel;
+            createFirstNode(value);
         } else {
+            Node<T> newNode = new Node(value, null, null);
             Node<T> firstNode = sentinel.next;
             firstNode.prev = newNode;
             newNode.next = firstNode;
             newNode.prev = (Node<T>) sentinel;
+            sentinel.next = newNode;
+            size += 1;
         }
+    }
 
+    public void addLast(T value) {
 
-        sentinel.next = newNode;
-        size += 1;
+        if (size == 0) {
+            createFirstNode(value);
+        } else {
+            Node<T> newNode = new Node(value, null, null);
+            Node<T> lastNode = sentinel.prev;
+            lastNode.next = newNode;
+            newNode.next = (Node<T>) sentinel;
+            newNode.prev = lastNode;
+            sentinel.prev = newNode;
+            size += 1;
+        }
     }
 
     public T removeFirst() {
@@ -55,6 +73,20 @@ public class LinkedListDeque<T> {
         size -= 1;
 
         return first.item;
+    }
+
+    public T removeLast() {
+        if (size == 0) {
+            return null;
+        }
+        Node<T> last = sentinel.prev;
+        last.prev.next = (Node<T>) sentinel;
+        sentinel.prev = last.prev;
+        last.next = null;
+        last.prev = null;
+
+        size -= 1;
+        return last.item;
     }
 
     public int size() {
