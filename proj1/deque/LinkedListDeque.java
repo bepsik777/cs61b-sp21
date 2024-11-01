@@ -1,6 +1,10 @@
 package deque;
 
-public class LinkedListDeque<T> {
+import deque.interfaces.Deque;
+import java.lang.Iterable;
+import java.util.Iterator;
+
+public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
     private class Node<K> {
         private K item;
@@ -18,26 +22,40 @@ public class LinkedListDeque<T> {
     private Node<Integer> sentinel;
 
     public LinkedListDeque() {
-        sentinel = new Node(1312, null, null);
+        sentinel = new Node<>(1312, null, null);
         size = 0;
     }
 
-    public void addFirst(T value) {
-        Node<T> newNode = new Node(value, null, null);
+
+    public void addFirst(T item) {
+        Node<T> newNode = new Node(item, null, null);
 
         if (size == 0) {
             sentinel.prev = newNode;
             newNode.next = (Node<T>) sentinel;
-            newNode.prev = (Node<T>) sentinel;
         } else {
             Node<T> firstNode = sentinel.next;
             firstNode.prev = newNode;
             newNode.next = firstNode;
-            newNode.prev = (Node<T>) sentinel;
         }
+        newNode.prev = (Node<T>) sentinel;
 
 
         sentinel.next = newNode;
+        size += 1;
+    }
+
+    public void addLast(T item) {
+        if (sentinel.next == null) {
+            addFirst(item);
+            return;
+        }
+
+        Node<T> lastNode = sentinel.prev;
+        Node<T> newNode = new Node<>(item, (Node<T>) sentinel, lastNode);
+
+        lastNode.next = newNode;
+        sentinel.prev = newNode;
         size += 1;
     }
 
@@ -55,6 +73,28 @@ public class LinkedListDeque<T> {
         size -= 1;
 
         return first.item;
+    }
+
+    public T removeLast() {
+        if (size == 0) {
+            return null;
+        }
+
+        Node<T> lastNode = sentinel.prev;
+
+        if (size == 1) {
+            sentinel.prev = null;
+        } else {
+            sentinel.prev = lastNode.prev;
+            lastNode.prev.next = (Node<T>) sentinel;
+        }
+
+        size -= 1;
+        return lastNode.item;
+    }
+
+    public T get(int index) {
+        return null;
     }
 
     public int size() {
@@ -84,5 +124,7 @@ public class LinkedListDeque<T> {
         printDeque(node.next);
     }
 
-
+    public Iterator<T> iterator() {
+        return null;
+    }
 }
