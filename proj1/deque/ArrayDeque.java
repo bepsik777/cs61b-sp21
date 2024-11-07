@@ -29,7 +29,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         for (int i = 0; i < size; i++) {
             newArr[currIndexOfNewArr] = items[currPointer];
 
-            if (currPointer >= items.length) {
+            if (currPointer >= items.length - 1) {
                 currPointer = 0;
             } else {
                 currPointer += 1;
@@ -70,6 +70,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         } else {
             growArray(4);
         }
+
+        nextFirst = items.length - 1;
+        nextLast = size;
     }
 
     private boolean isResizeNeeded() {
@@ -86,7 +89,12 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
         items[nextFirst] = item;
         size += 1;
-        nextFirst -= 1;
+
+        if (nextFirst == 0) {
+            nextFirst = items.length - 1;
+        } else {
+            nextFirst -= 1;
+        }
     };
 
     public void addLast(T item) {
