@@ -1,8 +1,10 @@
 package deque;
 
 import org.junit.Test;
-import org.junit.Assert.*;
+import static org.junit.Assert.*;
+import deque.ArrayDeque;
 
 public class ArrayDequeTest {
+
 
 }
