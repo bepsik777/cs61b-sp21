@@ -47,7 +47,13 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     }
 
     private void mapItemsToNewArray(T[] newArr) {
-        int currPointer = nextFirst + 1;
+        int currPointer;
+
+        if (nextFirst + 1 >= items.length)  {
+            currPointer = 0;
+        } else {
+            currPointer = nextFirst + 1;
+        }
 
         int currIndexOfNewArr = 0;
 
@@ -158,7 +164,13 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     };
 
     public T get(int index) {
-        return null;
+        int indexOfFirst = nextFirst + 1;
+
+        if (indexOfFirst + index >= items.length) {
+            return items[index - (items.length - 1 - indexOfFirst)];
+        } else {
+            return items[indexOfFirst + index];
+        }
     };
 
     @Override
