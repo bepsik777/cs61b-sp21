@@ -10,6 +10,31 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     private int nextFirst;
     private int nextLast;
 
+    private class DequeIterator implements Iterator<T> {
+        private int pointer;
+        private T currValue;
+
+        public DequeIterator() {
+            this.pointer = nextFirst + 1;
+        }
+
+        public boolean hasNext() {
+            return items[pointer] != null;
+        }
+
+        public T next() {
+            currValue = items[pointer];
+
+            if (pointer == items.length - 1) {
+                pointer = 0;
+            } else {
+                pointer += 1;
+            }
+
+            return currValue;
+        }
+    }
+
     public ArrayDeque() {
         this.items = (T[]) new Object[8];
         this.size = 0;
@@ -55,13 +80,6 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         this.items = newArr;
     }
 
-    public void printWholeArray() {
-        for (int i = 0; i < items.length - 1; i += 1) {
-            System.out.print(items[i] + " -> ");
-        }
-        System.out.println(items[items.length - 1]);
-    }
-
     private void resizeArray() {
         int usageFactor = getUsageFactor();
 
@@ -98,20 +116,38 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     };
 
     public void addLast(T item) {
+        if (isResizeNeeded()) {
+            resizeArray();
+        }
 
+        items[nextLast] = item;
+        size += 1;
+
+        if (nextLast >= items.length - 1) {
+            nextLast = 0;
+        } else {
+            nextLast += 1;
+        }
     };
 
     public boolean isEmpty() {
-        return false;
+        return size == 0;
     };
 
     public int size() {
-        return 0;
+        return size;
     };
 
     public void printDeque() {
 
     };
+
+    public void printWholeArray() {
+        for (int i = 0; i < items.length - 1; i += 1) {
+            System.out.print(items[i] + " -> ");
+        }
+        System.out.println(items[items.length - 1]);
+    }
 
     public T removeFirst() {
         return null;
@@ -125,8 +161,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         return null;
     };
 
+    @Override
     public Iterator<T> iterator() {
-        return null;
+        return new DequeIterator();
     }
 
 }
