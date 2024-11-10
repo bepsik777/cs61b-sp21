@@ -181,8 +181,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         }
 
         T removed = items[indexOfFirst];
-        items[indexOfFirst] = null;
         size -= 1;
+        items[indexOfFirst] = null;
+
+        nextFirst = nextFirst == items.length - 1 ? 0 : nextFirst + 1;
 
         return removed;
     };
@@ -204,6 +206,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         T removed = items[indexOfLast];
         items[indexOfLast] = null;
         size -= 1;
+
+        nextLast = nextLast == 0 ? items.length -1 : nextLast - 1;
 
         return removed;
     };
