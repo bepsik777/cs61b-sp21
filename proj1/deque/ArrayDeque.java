@@ -145,10 +145,14 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     };
 
     public void printDeque() {
-
+        for (int i = 0; i <= size - 2; i ++) {
+            System.out.print(get(i) + " -> ");
+        }
+        System.out.println(get(size - 1));
+        System.out.println(size);
     };
 
-    public void printWholeArray() {
+    private void printWholeArray() {
         for (int i = 0; i < items.length - 1; i += 1) {
             System.out.print(items[i] + " -> ");
         }
@@ -156,18 +160,50 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     }
 
     public T removeFirst() {
-        return null;
+        if (size == 0) {
+            return null;
+        }
+
+        int indexOfFirst;
+
+        if (nextFirst + 1 >= items.length - 1) {
+            indexOfFirst = 0;
+        } else {
+            indexOfFirst = nextFirst + 1;
+        }
+
+        T removed = items[indexOfFirst];
+        items[indexOfFirst] = null;
+        size -= 1;
+
+        return removed;
     };
 
     public T removeLast() {
-        return null;
+        if (size == 0) {
+            return null;
+        }
+
+        int indexOfLast;
+
+        if (nextLast - 1 < 0) {
+            indexOfLast = items.length - 1;
+        } else {
+            indexOfLast = nextLast - 1;
+        }
+
+        T removed = items[indexOfLast];
+        items[indexOfLast] = null;
+        size -= 1;
+
+        return removed;
     };
 
     public T get(int index) {
         int indexOfFirst = nextFirst + 1;
 
         if (indexOfFirst + index >= items.length) {
-            return items[index - (items.length - 1 - indexOfFirst)];
+            return items[index - (items.length - indexOfFirst)];
         } else {
             return items[indexOfFirst + index];
         }
