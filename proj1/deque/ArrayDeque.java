@@ -156,7 +156,6 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
             System.out.print(get(i) + " -> ");
         }
         System.out.println(get(size - 1));
-        System.out.println(size);
     };
 
     private void printWholeArray() {
@@ -174,7 +173,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
         int indexOfFirst;
 
-        if (nextFirst + 1 >= items.length - 1) {
+        if (nextFirst + 1 >= items.length) {
             indexOfFirst = 0;
         } else {
             indexOfFirst = nextFirst + 1;
@@ -184,7 +183,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         size -= 1;
         items[indexOfFirst] = null;
 
+
         nextFirst = nextFirst == items.length - 1 ? 0 : nextFirst + 1;
+
+
 
         return removed;
     };
