@@ -230,4 +230,33 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         return new DequeIterator();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (o == null) {
+            return false;
+        }
+
+        if (o.getClass() != this.getClass()) {
+            return false;
+        }
+
+        ArrayDeque<T> compared = (ArrayDeque<T>) o;
+
+        if (compared.size() != this.size) {
+            return false;
+        }
+
+        for (int i = 0; i < this.size; i += 1) {
+            if (!compared.get(i).equals(this.get(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }
