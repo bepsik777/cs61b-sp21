@@ -118,7 +118,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
     public T get(int index) {
         if (index < size) {
-            Node<T> curr = sentinel.next;
+            Node<T> curr = (Node<T>) sentinel;
             for (int i = 0; i <= index; i += 1) {
                 curr = curr.next;
             }
