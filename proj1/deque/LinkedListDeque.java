@@ -1,6 +1,7 @@
 package deque;
 
 import deque.interfaces.Deque;
+
 import java.lang.Iterable;
 import java.util.Iterator;
 
@@ -27,10 +28,12 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
             currNode = (Node<T>) sentinel;
         }
 
+        @Override
         public boolean hasNext() {
             return pointer < size;
         }
 
+        @Override
         public T next() {
             if (hasNext()) {
                 currNode = currNode.next;
@@ -49,7 +52,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         size = 0;
     }
 
-
+    @Override
     public void addFirst(T item) {
         Node<T> newNode = new Node(item, null, null);
 
@@ -68,6 +71,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         size += 1;
     }
 
+    @Override
     public void addLast(T item) {
         if (sentinel.next == null) {
             addFirst(item);
@@ -82,6 +86,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         size += 1;
     }
 
+    @Override
     public T removeFirst() {
         if (size == 0) {
             return null;
@@ -98,6 +103,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         return first.item;
     }
 
+    @Override
     public T removeLast() {
         if (size == 0) {
             return null;
@@ -116,6 +122,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         return lastNode.item;
     }
 
+    @Override
     public T get(int index) {
         if (index < size) {
             Node<T> curr = (Node<T>) sentinel;
@@ -144,14 +151,12 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         return getRecursive(index - 1, currNode);
     }
 
+    @Override
     public int size() {
         return size;
     }
 
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
+    @Override
     public void printDeque() {
         printDeque(sentinel.next);
     }
@@ -171,6 +176,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         printDeque(node.next);
     }
 
+    @Override
     public Iterator<T> iterator() {
         return new LinkedListDequeIterator();
     }
