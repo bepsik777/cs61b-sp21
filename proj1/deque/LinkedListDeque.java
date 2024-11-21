@@ -1,7 +1,5 @@
 package deque;
 
-import deque.interfaces.Deque;
-
 import java.lang.Iterable;
 import java.util.Iterator;
 

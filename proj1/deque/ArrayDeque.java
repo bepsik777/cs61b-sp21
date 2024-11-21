@@ -2,7 +2,6 @@ package deque;
 
 import java.lang.Iterable;
 import java.util.Iterator;
-import deque.interfaces.Deque;
 
 public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     private T[] items;
