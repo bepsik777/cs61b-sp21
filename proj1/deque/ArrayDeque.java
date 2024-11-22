@@ -80,7 +80,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
     @Override
     public void addFirst(T item) {
-        if (size == items.length) {
+        if (size == items.length - 1) {
             growArray(4);
         }
 
@@ -96,7 +96,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
     @Override
     public void addLast(T item) {
-        if (size == items.length) {
+        if (size == items.length - 1) {
             growArray(4);
         }
 
