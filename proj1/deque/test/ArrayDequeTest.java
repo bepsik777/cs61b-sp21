@@ -1,6 +1,8 @@
 package deque.test;
 
 import deque.ArrayDeque;
+import deque.Deque;
+import deque.LinkedListDeque;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -160,6 +162,19 @@ public class ArrayDequeTest {
             int random = StdRandom.uniform(0, 10000);
             assertEquals(list.get(random), myDeque.get(random));
         }
+    }
+
+    @Test
+    public void compareToLLDTest() {
+        Deque<Integer> myADeque = new ArrayDeque<>();
+        Deque<Integer> myLLDeque = new LinkedListDeque<>();
+
+        for (int i = 0; i < 100; i++) {
+            myADeque.addLast(i);
+            myLLDeque.addLast(i);
+        }
+
+        assertTrue("LLDeque and ADeque with same elements should be equal", myADeque.equals(myLLDeque));
     }
 
 //    @Test
