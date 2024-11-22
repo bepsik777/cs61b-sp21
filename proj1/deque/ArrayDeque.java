@@ -3,7 +3,7 @@ package deque;
 import java.lang.Iterable;
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
+public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private T[] items;
     private int size;
     private int nextFirst;
@@ -14,7 +14,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         private T currValue;
 
         public DequeIterator() {
-            this.pointer = nextFirst + 1;
+            this.pointer = nextFirst + 1 >= items.length ? 0 : nextFirst + 1;
         }
 
         @Override
@@ -43,40 +43,29 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         this.nextLast = 5;
     }
 
-    private int getUsageFactor() {
+    public int getContainerSize() {
+        return items.length;
+    }
+
+    private int getUsageFactor(int size) {
         return size * 100 / items.length;
     }
 
     private void mapItemsToNewArray(T[] newArr) {
-        int currPointer;
-
-        if (nextFirst + 1 >= items.length)  {
-            currPointer = 0;
-        } else {
-            currPointer = nextFirst + 1;
-        }
-
-        int currIndexOfNewArr = 0;
-
-        for (int i = 0; i < size; i++) {
-            newArr[currIndexOfNewArr] = items[currPointer];
-
-            if (currPointer >= items.length - 1) {
-                currPointer = 0;
-            } else {
-                currPointer += 1;
-            }
-            currIndexOfNewArr += 1;
+        for (int i = 0; i < size; i += 1) {
+            T mapped = this.get(i);
+            newArr[i] = mapped;
         }
     }
 
-    private void shrinkArray() {
-        int newSize = size * 4;
+    public void shrinkArray() {
+        int newSize = size * 3;
         T[] newArr = (T[]) new Object[newSize];
-
         mapItemsToNewArray(newArr);
 
-        this.items = newArr;
+        items = newArr;
+        nextFirst = items.length - 1;
+        nextLast = size;
     }
 
     private void growArray(int factor) {
@@ -84,33 +73,15 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         T[] newArr = (T[]) new Object[newSize];
         mapItemsToNewArray(newArr);
 
-        this.items = newArr;
-    }
-
-    private void resizeArray() {
-        int usageFactor = getUsageFactor();
-
-        if (usageFactor < 25) {
-            shrinkArray();
-        } else {
-            growArray(4);
-        }
-
+        items = newArr;
         nextFirst = items.length - 1;
         nextLast = size;
     }
 
-    private boolean isResizeNeeded() {
-        if (size == items.length) {
-            return true;
-        }
-        return size >= 16 && getUsageFactor() < 25;
-    }
-
     @Override
     public void addFirst(T item) {
-        if (isResizeNeeded()) {
-            resizeArray();
+        if (size == items.length) {
+            growArray(4);
         }
 
         items[nextFirst] = item;
@@ -121,12 +92,12 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         } else {
             nextFirst -= 1;
         }
-    };
+    }
 
     @Override
     public void addLast(T item) {
-        if (isResizeNeeded()) {
-            resizeArray();
+        if (size == items.length) {
+            growArray(4);
         }
 
         items[nextLast] = item;
@@ -137,32 +108,16 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         } else {
             nextLast += 1;
         }
-    };
-
-    @Override
-    public int size() {
-        return size;
-    };
-
-    @Override
-    public void printDeque() {
-        for (int i = 0; i <= size - 2; i ++) {
-            System.out.print(get(i) + " -> ");
-        }
-        System.out.println(get(size - 1));
-    };
-
-    private void printWholeArray() {
-        for (int i = 0; i < items.length - 1; i += 1) {
-            System.out.print(items[i] + " -> ");
-        }
-        System.out.println(items[items.length - 1]);
     }
 
     @Override
     public T removeFirst() {
         if (size == 0) {
             return null;
+        }
+
+        if (getUsageFactor(size - 1) < 25) {
+            shrinkArray();
         }
 
         int indexOfFirst;
@@ -180,15 +135,17 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
         nextFirst = nextFirst == items.length - 1 ? 0 : nextFirst + 1;
 
-
-
         return removed;
-    };
+    }
 
     @Override
     public T removeLast() {
         if (size == 0) {
             return null;
+        }
+
+        if (getUsageFactor(size - 1) < 25) {
+            shrinkArray();
         }
 
         int indexOfLast;
@@ -203,21 +160,44 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         items[indexOfLast] = null;
         size -= 1;
 
-        nextLast = nextLast == 0 ? items.length -1 : nextLast - 1;
+        nextLast = nextLast == 0 ? items.length - 1 : nextLast - 1;
 
         return removed;
-    };
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public void printDeque() {
+        for (int i = 0; i <= size - 2; i++) {
+            System.out.print(get(i) + " -> ");
+        }
+        System.out.println(get(size - 1));
+    }
+
+
+    public void printWholeArray() {
+        for (int i = 0; i < items.length - 1; i += 1) {
+            System.out.print(items[i] + " -> ");
+        }
+        System.out.println(items[items.length - 1]);
+    }
 
     @Override
     public T get(int index) {
-        int indexOfFirst = nextFirst + 1;
+        int indexOfFirst = nextFirst + 1 >= items.length ? 0 : nextFirst + 1;
 
         if (indexOfFirst + index >= items.length) {
             return items[index - (items.length - indexOfFirst)];
         } else {
             return items[indexOfFirst + index];
         }
-    };
+    }
+
+    ;
 
     @Override
     public Iterator<T> iterator() {
