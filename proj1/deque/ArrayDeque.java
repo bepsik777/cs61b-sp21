@@ -116,7 +116,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return null;
         }
 
-        if (getUsageFactor(size - 1) < USAGE_THRESHOLD && items.length >= 16) {
+        if (getUsageFactor(size - 1) < USAGE_THRESHOLD && items.length >= 15) {
             shrinkArray();
         }
 
@@ -144,7 +144,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return null;
         }
 
-        if (getUsageFactor(size - 1) < USAGE_THRESHOLD && items.length >= 16) {
+        if (getUsageFactor(size - 1) < USAGE_THRESHOLD && items.length >= 15) {
             shrinkArray();
         }
 
