@@ -1,6 +1,6 @@
-package deque;
+package deque.test;
 
-import net.sf.saxon.expr.Component;
+import deque.MaxArrayDeque;
 import org.junit.Test;
 
 import java.util.Comparator;
