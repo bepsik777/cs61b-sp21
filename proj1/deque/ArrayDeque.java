@@ -1,6 +1,5 @@
 package deque;
 
-import java.lang.Iterable;
 import java.util.Iterator;
 
 public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
@@ -8,6 +7,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private int size;
     private int nextFirst;
     private int nextLast;
+    private static final double USAGE_THRESHOLD = 0.25;
 
     private class DequeIterator implements Iterator<T> {
         private int pointer;
@@ -47,8 +47,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         return items.length;
     }
 
-    private int getUsageFactor(int size) {
-        return size * 100 / items.length;
+    private int getUsageFactor(int sizeChecked) {
+        return sizeChecked / items.length;
     }
 
     private void mapItemsToNewArray(T[] newArr) {
@@ -58,7 +58,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
     }
 
-    public void shrinkArray() {
+    private void shrinkArray() {
         int newSize = size * 3;
         T[] newArr = (T[]) new Object[newSize];
         mapItemsToNewArray(newArr);
@@ -116,7 +116,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return null;
         }
 
-        if (getUsageFactor(size - 1) < 25) {
+        if (getUsageFactor(size - 1) < USAGE_THRESHOLD) {
             shrinkArray();
         }
 
@@ -144,7 +144,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return null;
         }
 
-        if (getUsageFactor(size - 1) < 25) {
+        if (getUsageFactor(size - 1) < USAGE_THRESHOLD) {
             shrinkArray();
         }
 
@@ -196,8 +196,6 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return items[indexOfFirst + index];
         }
     }
-
-    ;
 
     @Override
     public Iterator<T> iterator() {
