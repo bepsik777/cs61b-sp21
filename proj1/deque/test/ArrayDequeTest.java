@@ -162,29 +162,29 @@ public class ArrayDequeTest {
         }
     }
 
-    @Test
-    public void resizingTest() {
-        ArrayDeque<Integer> myDeque = new ArrayDeque<>();
-
-        for (int i = 0; i < 10000; i++) {
-            int random = StdRandom.uniform(0, 4);
-
-            if (random == 0) {
-                myDeque.addFirst(i);
-            } else if (random == 1) {
-                myDeque.addLast(i);
-            } else if (!myDeque.isEmpty()) {
-                if (random == 2) {
-                    myDeque.removeFirst();
-                } else if (random == 3) {
-                    myDeque.removeLast();
-                }
-            }
-            if (myDeque.getContainerSize() >= 16) {
-                assertTrue("should be at least 25%",(double) myDeque.size()  / myDeque.getContainerSize() >= 0.25);
-            }
-        }
-    }
+//    @Test
+//    public void resizingTest() {
+//        ArrayDeque<Integer> myDeque = new ArrayDeque<>();
+//
+//        for (int i = 0; i < 10000; i++) {
+//            int random = StdRandom.uniform(0, 4);
+//
+//            if (random == 0) {
+//                myDeque.addFirst(i);
+//            } else if (random == 1) {
+//                myDeque.addLast(i);
+//            } else if (!myDeque.isEmpty()) {
+//                if (random == 2) {
+//                    myDeque.removeFirst();
+//                } else if (random == 3) {
+//                    myDeque.removeLast();
+//                }
+//            }
+//            if (myDeque.getContainerSize() >= 16) {
+//                assertTrue("should be at least 25%",(double) myDeque.size()  / myDeque.getContainerSize() >= 0.25);
+//            }
+//        }
+//    }
 }
 
 

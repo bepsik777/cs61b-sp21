@@ -13,7 +13,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         private int pointer;
         private T currValue;
 
-        public DequeIterator() {
+        DequeIterator() {
             this.pointer = nextFirst + 1 >= items.length ? 0 : nextFirst + 1;
         }
 
@@ -43,7 +43,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         this.nextLast = 5;
     }
 
-    public int getContainerSize() {
+    private int getContainerSize() {
         return items.length;
     }
 
@@ -179,7 +179,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
 
-    public void printWholeArray() {
+    private void printWholeArray() {
         for (int i = 0; i < items.length - 1; i += 1) {
             System.out.print(items[i] + " -> ");
         }
