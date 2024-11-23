@@ -25,13 +25,11 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         @Override
         public T next() {
             currValue = items[pointer];
-
             if (pointer == items.length - 1) {
                 pointer = 0;
             } else {
                 pointer += 1;
             }
-
             return currValue;
         }
     }
@@ -59,20 +57,18 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     private void shrinkArray() {
-        int newSize = size * 3;
+        int newSize = size * 2;
         T[] newArr = (T[]) new Object[newSize];
         mapItemsToNewArray(newArr);
-
         items = newArr;
         nextFirst = items.length - 1;
         nextLast = size;
     }
 
     private void growArray(int factor) {
-        int newSize = items.length * factor;
+        int newSize = size * factor;
         T[] newArr = (T[]) new Object[newSize];
         mapItemsToNewArray(newArr);
-
         items = newArr;
         nextFirst = items.length - 1;
         nextLast = size;
@@ -81,12 +77,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     @Override
     public void addFirst(T item) {
         if (size == items.length - 1) {
-            growArray(4);
+            growArray(2);
         }
-
         items[nextFirst] = item;
         size += 1;
-
         if (nextFirst == 0) {
             nextFirst = items.length - 1;
         } else {
@@ -97,12 +91,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     @Override
     public void addLast(T item) {
         if (size == items.length - 1) {
-            growArray(4);
+            growArray(2);
         }
-
         items[nextLast] = item;
         size += 1;
-
         if (nextLast >= items.length - 1) {
             nextLast = 0;
         } else {
@@ -115,26 +107,19 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (size == 0) {
             return null;
         }
-
         if (getUsageFactor(size - 1) < USAGE_THRESHOLD && items.length >= 15) {
             shrinkArray();
         }
-
         int indexOfFirst;
-
         if (nextFirst + 1 >= items.length) {
             indexOfFirst = 0;
         } else {
             indexOfFirst = nextFirst + 1;
         }
-
         T removed = items[indexOfFirst];
         size -= 1;
         items[indexOfFirst] = null;
-
-
         nextFirst = nextFirst == items.length - 1 ? 0 : nextFirst + 1;
-
         return removed;
     }
 
