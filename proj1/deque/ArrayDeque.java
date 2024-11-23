@@ -45,8 +45,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         return items.length;
     }
 
-    private int getUsageFactor(int sizeChecked) {
-        return sizeChecked / items.length;
+    private double getUsageFactor(int sizeChecked) {
+        return (double) sizeChecked / items.length;
     }
 
     private void mapItemsToNewArray(T[] newArr) {
@@ -76,7 +76,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
     @Override
     public void addFirst(T item) {
-        if (size == items.length - 1) {
+        if (size == items.length) {
             growArray(2);
         }
         items[nextFirst] = item;
@@ -90,7 +90,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
     @Override
     public void addLast(T item) {
-        if (size == items.length - 1) {
+        if (size == items.length) {
             growArray(2);
         }
         items[nextLast] = item;
@@ -108,6 +108,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return null;
         }
         if (getUsageFactor(size - 1) < USAGE_THRESHOLD && items.length >= 15) {
+            System.out.println("this pass");
             shrinkArray();
         }
         int indexOfFirst;
