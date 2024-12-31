@@ -11,13 +11,6 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         Node left;
         Node right;
 
-        public Node() {
-            key = null;
-            val = null;
-            left = null;
-            right = null;
-        }
-
         public Node(K k, V v) {
             key = k;
             val = v;
@@ -37,12 +30,29 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public void clear() {
+        root = null;
+        size = 0;
+    }
 
+
+    private boolean containsKey(K key, Node n) {
+        if (n == null) {
+            return false;
+        }
+
+        int cmp = key.compareTo(n.key);
+        if (cmp > 0) {
+            return containsKey(key, n.right);
+        } else if (cmp < 0) {
+            return containsKey(key, n.left);
+        } else {
+            return true;
+        }
     }
 
     @Override
     public boolean containsKey(K key) {
-        return false;
+        return containsKey(key, root);
     }
 
     private V get(K key, Node n) {
@@ -67,11 +77,12 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public int size() {
-        return 0;
+        return size;
     }
 
     private Node put(K key, V value, Node n) {
         if (n == null) {
+            size += 1;
             return new Node(key, value);
         }
         int cmp = key.compareTo(n.key);
@@ -137,9 +148,9 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         bst.put(8, "de nada");
         bst.put(3, "whatever");
         bst.put(3, "nice");
+        bst.put(11, null);
         bst.printInOrder();
-
-        System.out.println(bst.get(8));
+        System.out.println(bst.containsKey(11));
     }
 
 }
