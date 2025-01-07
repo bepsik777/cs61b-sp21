@@ -236,21 +236,4 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     public void printInOrder() {
         printInOrder(root);
     }
-
-    public static void main(String[] args) {
-        BSTMap<Integer, String> bst = new BSTMap<>();
-        bst.put(4, "d");
-        bst.put(2, "a");
-        bst.put(6, "b");
-        bst.put(1, "n");
-        bst.put(3, "k");
-        bst.put(5, "v");
-        bst.put(6, "m");
-
-        bst.printInOrder();
-        System.out.println("-----------");
-        bst.remove(4);
-        bst.printInOrder();
-
-    }
 }
