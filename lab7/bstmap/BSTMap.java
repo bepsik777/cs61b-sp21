@@ -2,7 +2,10 @@ package bstmap;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.ArrayList;
 import java.lang.Comparable;
+
+import static org.junit.Assert.assertTrue;
 
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     private class Node {
@@ -19,13 +22,52 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         }
     }
 
+    private class BSTMapIterator implements Iterator<K> {
+        ArrayList<K> visitedKeys;
+        int pointer;
+
+        public BSTMapIterator() {
+            visitedKeys = new ArrayList<>();
+            pointer = 0;
+            inOrder(root);
+        }
+
+        private void inOrder(Node n) {
+            if (n == null) {
+                return;
+            }
+
+            inOrder(n.left);
+            visitedKeys.add(n.key);
+            inOrder(n.right);
+        }
+
+        public boolean hasNext() {
+            return pointer < size;
+        }
+
+
+        public K next() {
+            if (!hasNext()) {
+                return null;
+            }
+            ;
+            K curr = visitedKeys.get(pointer);
+            pointer += 1;
+            return curr;
+        }
+    }
+
+
     private Node root;
     private int size;
+    private Node previouslyRemoved;
 
 
     public BSTMap() {
         root = null;
         size = 0;
+        previouslyRemoved = null;
     }
 
     @Override
@@ -106,19 +148,73 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         return null;
     }
 
+    private Node remove(K key, Node n) {
+        if (n == null) {
+            return null;
+        }
+
+        int cmp = key.compareTo(n.key);
+
+        if (cmp < 0) {
+            n.left = remove(key, n.left);
+        } else if (cmp > 0) {
+            n.right = remove(key, n.right);
+        } else {
+            size -= 1;
+            previouslyRemoved = n;
+            if (n.left == null) return n.right;
+            if (n.right == null) return n.left;
+
+            if (root.key.compareTo(n.key) < 0) {
+                deleteMin(root.right);
+            } else {
+                deleteMax(root.left);
+            }
+
+            n.key = previouslyRemoved.key;
+            n.val = previouslyRemoved.val;
+            previouslyRemoved = n;
+        }
+        return n;
+    }
+
     @Override
     public V remove(K key) {
-        return null;
+        root = remove(key, root);
+        V target = previouslyRemoved.val;
+        previouslyRemoved = null;
+        return target;
+    }
+
+    private Node deleteMin(Node n) {
+        if (n.left == null) {
+            previouslyRemoved = n;
+            size = size - 1;
+            return n.right;
+        }
+        n.left = deleteMin(n.left);
+        return n;
+    }
+
+    private Node deleteMax(Node n) {
+        if (n.right == null) {
+            previouslyRemoved = n;
+            size = size - 1;
+            return n.left;
+        }
+        n.right = deleteMin(n.right);
+        return n;
     }
 
     @Override
     public V remove(K key, V value) {
-        return null;
+        throw new UnsupportedOperationException();
     }
+
 
     @Override
     public Iterator<K> iterator() {
-        return null;
+        return new BSTMapIterator();
     }
 
     private void printInOrder(Node n) {
@@ -143,14 +239,18 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     public static void main(String[] args) {
         BSTMap<Integer, String> bst = new BSTMap<>();
-        bst.put(5, "cat");
-        bst.put(1, "hello");
-        bst.put(8, "de nada");
-        bst.put(3, "whatever");
-        bst.put(3, "nice");
-        bst.put(11, null);
-        bst.printInOrder();
-        System.out.println(bst.containsKey(11));
-    }
+        bst.put(4, "d");
+        bst.put(2, "a");
+        bst.put(6, "b");
+        bst.put(1, "n");
+        bst.put(3, "k");
+        bst.put(5, "v");
+        bst.put(6, "m");
 
+        bst.printInOrder();
+        System.out.println("-----------");
+        bst.remove(4);
+        bst.printInOrder();
+
+    }
 }
