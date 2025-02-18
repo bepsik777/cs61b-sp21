@@ -26,6 +26,43 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         }
     }
 
+    protected class MapIterator implements Iterator<K> {
+        private int visited = 0;
+        private int tablePointer = 0;
+        private Iterator<Node> bucketIter;
+        private Collection<Node> currBucket;
+
+        public MapIterator() {
+            currBucket = getNextBucket();
+            if (currBucket != null) {
+                bucketIter = currBucket.iterator();
+            }
+        }
+
+        public boolean hasNext() {
+            return visited < size;
+        }
+
+        public K next() {
+            if (!hasNext()) return null;
+            if (currBucket == null || !bucketIter.hasNext()) {
+                tablePointer += 1;
+                currBucket = getNextBucket();
+                bucketIter = currBucket.iterator();
+            }
+            visited += 1;
+            Node n = bucketIter.next();
+            return n.key;
+        }
+
+        private Collection<Node> getNextBucket() {
+            while (hasNext() && buckets[tablePointer] == null) {
+                tablePointer += 1;
+            }
+            return buckets[tablePointer];
+        }
+    }
+
     /* Instance Variables */
     final double MAX_LOAD;
 
@@ -98,12 +135,15 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         return new Collection[tableSize];
     }
 
+    @Override
     public void clear() {
-
+        buckets = createTable(buckets.length);
+        size = 0;
     }
 
+    @Override
     public boolean containsKey(K key) {
-        int address = key.hashCode() % buckets.length;
+        int address = getAddress(key, buckets);
         if (buckets[address] != null) {
             Collection<Node> bucket = buckets[address];
             for (Node n : bucket) {
@@ -115,11 +155,12 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         return false;
     }
 
+    @Override
     public V get(K key) {
-        int address = key.hashCode() % buckets.length;
+        int address = getAddress(key, buckets);
         Collection<Node> bucket = buckets[address];
         if (bucket == null) return null;
-        for (Node n: bucket) {
+        for (Node n : bucket) {
             if (n.key.equals(key)) {
                 return n.value;
             }
@@ -127,12 +168,14 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         return null;
     }
 
+    @Override
     public int size() {
         return size;
     }
 
+    @Override
     public void put(K key, V val) {
-        int address = key.hashCode() % buckets.length;
+        int address = getAddress(key, buckets);
         if (buckets[address] == null) {
             buckets[address] = createBucket();
         }
@@ -143,7 +186,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
                 return;
             }
         }
-        bucket.add(new Node(key, val));
+        bucket.add(createNode(key, val));
         size += 1;
 
         if (needResize()) {
@@ -152,33 +195,63 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     }
 
 
+    @Override
     public Set<K> keySet() {
-        return null;
+        Set<K> keySet = new HashSet<>();
+        for (Collection<Node> c : buckets) {
+            if (c != null) {
+                for (Node n : c) {
+                    keySet.add(n.key);
+                }
+            }
+        }
+        return keySet;
     }
 
+    @Override
     public V remove(K key) {
-        return null;
+        V removedValue = null;
+        int address = getAddress(key, buckets);
+        Collection<Node> bucket = buckets[address];
+        for (Node n : bucket) {
+            if (n.key.equals(key)) {
+                removedValue = n.value;
+                bucket.remove(n);
+            }
+        }
+        return removedValue;
     }
 
+    @Override
     public V remove(K key, V val) {
-        return null;
+        V removedValue = null;
+        int address = getAddress(key, buckets);
+        Collection<Node> bucket = buckets[address];
+        for (Node n : bucket) {
+            if (n.key.equals(key) && n.value.equals(val)) {
+                removedValue = n.value;
+                bucket.remove(n);
+            }
+        }
+        return removedValue;
     }
 
+    @Override
     public Iterator<K> iterator() {
-        return null;
+        return new MapIterator();
     }
 
-    private boolean needResize() {
+    protected boolean needResize() {
         double loadFactor = (double) size / buckets.length;
         return loadFactor >= MAX_LOAD;
     }
 
-    private void resize() {
+    protected void resize() {
         Collection<Node>[] newTable = createTable(buckets.length * 2);
-        for (Collection<Node> c: buckets) {
+        for (Collection<Node> c : buckets) {
             if (c != null) {
-                for (Node n: c) {
-                    int newAddress = n.key.hashCode() % newTable.length;
+                for (Node n : c) {
+                    int newAddress = getAddress(n.key, newTable);
                     if (newTable[newAddress] == null) {
                         newTable[newAddress] = createBucket();
                     }
@@ -188,6 +261,10 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
             }
         }
         buckets = newTable;
+    }
+
+    protected int getAddress(K key, Collection<Node>[] table) {
+        return Math.floorMod(key.hashCode(), table.length);
     }
 
     public void printTable() {
@@ -202,19 +279,5 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
             }
             System.out.print("\n");
         }
-    }
-
-    public static void main(String[] args) {
-        MyHashMap<Integer, String> map = new MyHashMap<>(16);
-        Random r = new Random();
-
-        for (int i = 0; i < 10; i++) {
-            int randomInt = r.nextInt(122 - 97 + 1) + 97;
-            char randomChar = (char) randomInt;
-            map.put(randomInt, String.valueOf(randomChar));
-        }
-        map.printTable();
-        map.put(9, "hello");
-        System.out.println(map.get(9));
     }
 }
