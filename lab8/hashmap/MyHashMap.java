@@ -26,7 +26,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         }
     }
 
-    protected class MapIterator implements Iterator<K> {
+    private class MapIterator implements Iterator<K> {
         private int visited = 0;
         private int tablePointer = 0;
         private Iterator<Node> bucketIter;
@@ -64,7 +64,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     }
 
     /* Instance Variables */
-    final double MAX_LOAD;
+    private final double MAX_LOAD;
 
     private Collection<Node>[] buckets;
     private int size = 0;
@@ -241,12 +241,12 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         return new MapIterator();
     }
 
-    protected boolean needResize() {
+    private boolean needResize() {
         double loadFactor = (double) size / buckets.length;
         return loadFactor >= MAX_LOAD;
     }
 
-    protected void resize() {
+    private void resize() {
         Collection<Node>[] newTable = createTable(buckets.length * 2);
         for (Collection<Node> c : buckets) {
             if (c != null) {
@@ -263,11 +263,11 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         buckets = newTable;
     }
 
-    protected int getAddress(K key, Collection<Node>[] table) {
+    private int getAddress(K key, Collection<Node>[] table) {
         return Math.floorMod(key.hashCode(), table.length);
     }
 
-    public void printTable() {
+    private void printTable() {
         for (int i = 0; i < buckets.length; i++) {
             System.out.print("bucket " + i + ":");
             if (buckets[i] == null) {
