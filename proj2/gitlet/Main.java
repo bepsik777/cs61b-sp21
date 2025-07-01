@@ -1,6 +1,8 @@
 package gitlet;
 
 
+import static gitlet.Utils.*;
+
 /**
  * Driver class for Gitlet, a subset of the Git version-control system.
  *
@@ -20,15 +22,56 @@ public class Main {
                 Repository.init();
                 break;
             case "add":
-                String fileName = args[1];
-                if (fileName == null) {
+                if (args.length == 1) {
                     System.out.println("pls provide a valid file path");
                     break;
                 }
+                String fileName = args[1];
                 Repository.add(fileName);
                 break;
+            case "rm":
+                if (args.length == 1) {
+                    System.out.println("pls provide a valid file path");
+                    break;
+                }
+                String path = args[1];
+                Repository.remove(path);
+                break;
+            case "commit":
+                if (args.length == 1) {
+                    System.out.println("pls provide a commit message");
+                    break;
+                }
+                String message = args[1];
+                Repository.commit(message);
+                break;
+            case "checkout":
+                if (args.length == 1) {
+                    System.out.println("pls provide a commit message");
+                    break;
+                }
+                if (args.length == 2) {
+                    break;
+                }
+                if (args.length == 3 && args[1].equals("--")) {
+                    String checkedOutFile = args[2];
+                    Repository.basicCheckout(checkedOutFile);
+                    break;
+                }
+                if (args.length == 4) {
+                    String commitID = args[1];
+                    String checkedOutFile = args[3];
+                    Repository.basicCheckout(checkedOutFile, commitID);
+                    break;
+                }
+            case "log":
+                Repository.log();
+                break;
+            case "print-head":
+                printHeadCommit();
+                break;
             case "print-index":
-                Repository.printStagingArea();
+                printStagingArea();
                 break;
         }
     }

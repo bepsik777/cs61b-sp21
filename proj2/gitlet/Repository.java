@@ -1,9 +1,12 @@
 package gitlet;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import static gitlet.StagingArea.*;
 
 import static gitlet.Utils.*;
@@ -72,40 +75,111 @@ public class Repository {
     }
 
     public static void add(String filePath) {
-        File targetFile = join(CWD, filePath);
-        HashMap<String, String> stagingArea = StagingArea.getNewestStagingArea();
-        Blob blob = new Blob(targetFile);
-        String fileId = sha1(serialize(blob));
+        byte[] targetFileContent = readContents(join(CWD, filePath));
+        HashMap<String, byte[]> stagingArea = StagingArea.getNewestStagingArea();
         if (stagingArea.containsKey(filePath)
-                && stagingArea.get(filePath).equals(fileId)) {
+                && Arrays.equals(targetFileContent, stagingArea.get(filePath))) {
             return;
         }
-        stagingArea.put(filePath, fileId);
+        /*
+         * If current working version is same as in HEAD commit, remove from staging area
+         */
+        if (isTrackedByHeadCommit(filePath, targetFileContent)) {
+            stagingArea.remove(filePath);
+            return;
+        }
+
+        stagingArea.put(filePath, targetFileContent);
         saveStagingArea(stagingArea);
+    }
+
+    public static void commit(String message) {
+        Map<String, byte[]> stagingArea = StagingArea.getNewestStagingArea();
+        if (stagingArea.isEmpty()) {
+            System.out.println("No changes added to the commit.");
+            return;
+        }
+        String headCommitId = Refs.getHeadCommitId();
+        String activeBranch = Refs.getActiveBranch();
+        Commit newCommit = new Commit(message, headCommitId, activeBranch);
+        newCommit.setTrackedFiles(StagingArea.getNewestStagingArea());
+
         try {
-            saveObject(blob);
+            for (String key : stagingArea.keySet()) {
+                saveObject(new Blob(stagingArea.get(key)));
+            }
+            String commitId = saveObject(newCommit);
+            Refs.updateHead(commitId, "master");
         } catch (IOException e) {
-            System.out.println(e.getClass() + " " + e.getMessage());
+            System.out.println(e.getMessage());
         }
+        StagingArea.clearStagingArea();
     }
 
-    public static void printStagingArea() {
-        HashMap<String, String> stagingArea = StagingArea.getNewestStagingArea();
-        Set<String> keySet = stagingArea.keySet();
-        for (String k: keySet) {
-            System.out.println(k + ": " + stagingArea.get(k));
+    public static void remove(String filepath) {
+        File file = join(CWD, filepath);
+        if (!file.exists()) {
+            System.out.println("No such file in the current directory");
+            return;
         }
+        HashMap<String, byte[]> stagingArea = StagingArea.getNewestStagingArea();
+        Commit headCommit = getHeadCommit();
+        Map<String, String> trackedFiles = headCommit.getTrackedFiles();
+
+        if (!stagingArea.containsKey(filepath) && !trackedFiles.containsKey(filepath)) {
+            System.out.println("No reason to remove the file.");
+            return;
+        }
+
+        //Remove file from staging area if staged
+        stagingArea.remove(filepath);
+
+        //stage for removal and delete from CWD if file is tracked by head commit
+        String fileId = sha1((Object) serialize(new Blob(file)));
+        if (trackedFiles.containsKey(filepath) && trackedFiles.get(filepath).equals(fileId)) {
+            stagingArea.put(filepath, null);
+            restrictedDelete(filepath);
+        }
+        saveStagingArea(stagingArea);
     }
 
-    public static String saveObject(Serializable gitObject) throws IOException {
-        String objectId = sha1((Object) serialize(gitObject));
-        File dir = join(OBJECTS, objectId.substring(0, 2));
-        File file = join(dir, objectId.substring(2));
-        if (!dir.exists()) {
-            dir.mkdir();
+    public static void basicCheckout(String fileName) {
+        basicCheckout(fileName, null);
+    }
+
+    public static void basicCheckout(String fileName, String commitID) {
+        File targetFile = join(CWD, fileName);
+        Commit targetCommit;
+        if (commitID == null) {
+            targetCommit = getHeadCommit();
+        } else {
+            targetCommit = getCommitByShaHash(commitID);
         }
-        file.createNewFile();
-        writeObject(file, gitObject);
-        return objectId;
+        Map<String, String> filesTrackedByCommit = targetCommit.getTrackedFiles();
+        if (!filesTrackedByCommit.containsKey(fileName)) {
+            System.out.println("File does not exist in that commit.");
+            return;
+        }
+        File trackedFile = getFileByShaHash(filesTrackedByCommit.get(fileName));
+        Blob trackedBlob = readObject(trackedFile, Blob.class);
+        byte[] trackedContent = trackedBlob.getFileContent();
+        String deserializedContent = new String(trackedContent, StandardCharsets.UTF_8);
+        writeContents(targetFile, deserializedContent);
+    }
+
+    public static void log(Commit commit, String commitID) {
+        commit.log(commitID);
+        if (commit.getParentID() == null) {
+            return;
+        }
+        String parentId = commit.getParentID();
+        Commit parentCommit = getCommitByShaHash(parentId);
+        log(parentCommit, parentId);
+    }
+
+    public static void log() {
+        String headId = Refs.getHeadCommitId();
+        Commit headCommit = getHeadCommit();
+        log(headCommit, headId);
     }
 }
