@@ -1,6 +1,8 @@
 package gitlet;
 
 import java.io.File;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static gitlet.Utils.*;
 
@@ -23,13 +25,22 @@ public class Refs {
         }
     }
 
-    public static void updateHead(String commit, String branch) {
-        File branchHead = join(HEADS_DIR, branch);
+    public static void switchBranch(String branchName) {
+        File branchHead = join(HEADS_DIR, branchName);
+        if (branchHead.exists()) {
+            writeContents(HEAD, "ref: refs/heads/", branchName);
+        } else {
+            throw new GitletException("No branch with this name exist");
+        }
+    }
+
+    public static void updateHead(String commit, String branchName) {
+        File branchHead = join(HEADS_DIR, branchName);
         if (branchHead.exists()) {
             writeContents(branchHead, commit);
-            writeContents(HEAD, "ref: refs/heads/", branch);
+            writeContents(HEAD, "ref: refs/heads/", branchName);
         } else {
-            System.out.println("No branch with this name exit");
+            System.out.println("No branch with this name exist");
         }
     }
 
@@ -40,6 +51,29 @@ public class Refs {
     }
 
     public static String getActiveBranch() {
-        return readContentsAsString(HEAD).replaceFirst("ref: ", "").replaceFirst(HEADS_DIR.toString(), "");
+        return readContentsAsString(HEAD).replaceFirst("ref: refs/heads/", "");
+    }
+
+    public static void createNewBranch(String branchName, String headCommitID) {
+        File newBranch = join(HEADS_DIR, branchName);
+        if (newBranch.exists()) {
+            System.out.println("Branch with the given name already exist");
+            return;
+        }
+        try {
+            newBranch.createNewFile();
+            writeContents(newBranch, headCommitID);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static List<Commit> getAllBranchesHeadsCommits() {
+        List<String> filesInHeadsDir = plainFilenamesIn(HEADS_DIR);
+        if (filesInHeadsDir == null) {
+            System.out.println("no commits to log");
+            return null;
+        }
+        return filesInHeadsDir.stream().map(fileName -> readContentsAsString(join(HEADS_DIR, fileName))).map(Utils::getCommitByShaHash).collect(Collectors.toList());
     }
 }
