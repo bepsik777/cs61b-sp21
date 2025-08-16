@@ -39,7 +39,7 @@ public class Main {
                 break;
             case "commit":
                 if (args.length == 1) {
-                    System.out.println("pls provide a commit message");
+                    System.out.println("Please enter a commit message.");
                     break;
                 }
                 String message = args[1];
@@ -85,6 +85,9 @@ public class Main {
                 break;
             case "print-index":
                 printStagingArea();
+                break;
+            case "status":
+                Repository.status();
                 break;
         }
     }
